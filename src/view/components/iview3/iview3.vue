@@ -125,14 +125,29 @@
       </Card>
     </i-col>
   </Row>
+  <Row :gutter="14">
+    <i-col span="24">
+      <Card>
+        <Row>
+          <vuetable ref="vuetable"
+            api-url="https://vuetable.ratiw.net/api/users"
+            :fields="['name', 'email', 'birthdate']"
+          ></vuetable>
+        </Row>
+      </Card>
+    </i-col>
+  </Row>
 
 </div>
 </template>
 
 <script>
+import Vuetable from 'vuetable-2/src/components/Vuetable'
 export default {
-  name: 'iview2',
-  components: {},
+  name: 'iview3',
+  components: {
+    Vuetable
+  },
   data () {
     return {
       formInline: {
@@ -222,7 +237,12 @@ export default {
 
     },
     handleSelectAll (status) {
-      this.$refs.selection.selectAll(status)
+      this.$http.get('http://localhost:8090/people', {}).then(function (response) {
+        // response.data中获取ResponseData实体
+        console.log(response.data)
+      }, function (response) {
+        // 发生错误
+      })
     }
   },
   mounted () {

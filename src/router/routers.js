@@ -53,18 +53,34 @@ export default [
     }
   },
   {
-    path: '/iview2',
-    name: 'iview2',
+    path: '/iview3',
+    name: 'iview3',
     component: Main,
     children: [
       {
-        path: 'iview2',
-        name: 'iview2',
+        path: 'iview3',
+        name: 'iview3',
         meta: {
           icon: '_qq',
-          title: 'iview2组件'
+          title: 'iview3组件'
         },
-        component: () => import('@/view/components/iview2/iview2.vue')
+        component: () => import('@/view/components/iview3/iview3.vue')
+      }
+    ]
+  },
+  {
+    path: '/curd',
+    name: 'curd',
+    component: Main,
+    children: [
+      {
+        path: 'curd',
+        name: 'curd',
+        meta: {
+          icon: '_qq',
+          title: 'curd'
+        },
+        component: () => import('@/view/curd/curd.vue')
       }
     ]
   },
