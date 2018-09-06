@@ -70,7 +70,7 @@ export default [
   },
   {
     path: '/curd',
-    name: 'curd',
+    name: 'curdp',
     component: Main,
     children: [
       {
@@ -80,7 +80,7 @@ export default [
           icon: '_qq',
           title: 'curd'
         },
-        component: () => import('@/view/curd/curd.vue')
+        component: () => import('@/view/curd/CurdTable.vue')
       }
     ]
   },

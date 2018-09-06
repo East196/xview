@@ -13,3 +13,6 @@
 [0906/152245:ERROR:crash_report_database_win.cc(571)] CreateDirectory C:\Program Files (x86)\UCBrowser\Application\6.2.4094.1\Dumps: 拒绝访问。 (0x5)
 [0906/152245:ERROR:registration_protocol_win.cc(82)] TransactNamedPipe: 管道已结束。 (0x6D)
 [0906/152245:ERROR:crash_report_database_win.cc(571)] CreateDirectory C:\Program Files (x86)\UCBrowser\Application\6.2.4094.1\Dumps: 拒绝访问。 (0x5)
+[0906/170525:ERROR:crash_report_database_win.cc(571)] CreateDirectory C:\Program Files (x86)\UCBrowser\Application\6.2.4094.1\Dumps: 拒绝访问。 (0x5)
+[0906/170525:ERROR:registration_protocol_win.cc(82)] TransactNamedPipe: 管道已结束。 (0x6D)
+[0906/170525:ERROR:crash_report_database_win.cc(571)] CreateDirectory C:\Program Files (x86)\UCBrowser\Application\6.2.4094.1\Dumps: 拒绝访问。 (0x5)
