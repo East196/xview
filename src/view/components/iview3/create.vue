@@ -1,7 +1,7 @@
 <template>
 
   <Drawer title="添加用户" :closable="false" v-model="showCreate">
-    <Row type="flex" justify="center" align="middle" class="countto-page-row">
+    <Row type="flex" justify="center" align="middle">
       <Form ref="people" :model="people" inline>
         <FormItem label="名">
           <Input v-model="people.firstName" placeholder="请输入 名" clearable style="width: 200px"></Input>

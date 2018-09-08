@@ -1,7 +1,7 @@
 <template>
 
-  <Drawer title="添加用户" :closable="false" v-model="showEdit">
-    <Row type="flex" justify="center" align="middle" class="countto-page-row">
+  <Drawer title="修改用户" :closable="false" v-model="showEdit">
+    <Row type="flex" justify="center" align="middle">
       <Form ref="people" :model="people" inline>
         <FormItem label="名">
           <Input v-model="people.firstName" placeholder="请输入 名" clearable style="width: 200px"></Input>
@@ -24,7 +24,7 @@
             <Button @click="reset()">重置</Button>
             <Button @click="cancel()">取消</Button>
           </ButtonGroup>
-          {{showCreate}}
+          {{showEdit}}
         </FormItem>
       </Form>
     </Row>

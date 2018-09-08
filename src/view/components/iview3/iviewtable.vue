@@ -13,23 +13,26 @@
         </Row>
         <br>
         <Row>
-          <Table border ref="selection" :columns="columns4" :data="data1"></Table>
+          <Table border ref="selection" :size="small" :columns="columns" :data="data" @on-sort-change="handleSortChange"></Table>
         </Row>
         <br>
         <Row>
           <Page :total="pageTotal" :current="pageNum" :page-size="pageSize" show-elevator show-sizer show-total placement="top" @on-change="handlePage" @on-page-size-change='handlePageSize'></Page>
         </Row>
-        <Create v-bind:show-create="showCreate" v-on:ok-create="showAll($event)" v-on:show-create="showCreate=$event"></Create>
-        <Edit v-bind:people="people" v-bind:show-edit="showEdit" v-on:ok-edit="showAll($event)" v-on:show-edit="showEdit=$event"></Edit>
+        <Create :show-create="showCreate" v-on:ok-create="showAll()" v-on:show-create="showCreate=$event"></Create>
+        <Edit :people="people" :show-edit="showEdit" v-on:ok-edit="showAll()" v-on:show-edit="showEdit=$event"></Edit>
+        <Detail :people="people" :show-detail="showDetail" v-on:show-detail="showDetail=$event"></Detail>
       </Card>
     </i-col>
   </Row>
   <Row :gutter="14">
     <i-col span="24">
       <Card>
-        {{showCreate}}
-        {{showEdit}}
+        {{showCreate}} {{showEdit}} {{showDetail}}
+        <br>
         {{people}}
+        <br>
+        {{page}} {{pageSize}} {{pageNum}} {{pageTotal}} {{sort}}
       </Card>
     </i-col>
   </Row>
@@ -40,21 +43,30 @@
 import axios from '@/libs/api.request'
 import Create from './create.vue'
 import Edit from './edit.vue'
+import Detail from './detail.vue'
 export default {
   name: 'iviewtable',
   components: {
     Create,
-    Edit
+    Edit,
+    Detail
   },
   data() {
     return {
+      pageSize: 20,
+      pageNum: 1,
+      pageTotal: 0,
 
+      sort: 'age,desc',
 
+      page: {},
+
+      showDetail: false,
       showEdit: false,
       people: {},
 
       showCreate: false,
-      columns4: [{
+      columns: [{
           type: 'selection',
           width: 50,
           fixed: 'left',
@@ -62,13 +74,13 @@ export default {
         },
         {
           title: 'Name',
-          key: 'firstName',
+          key: 'name',
           width: 200
         },
         {
           title: 'Age',
           key: 'age',
-          sortable: true
+          sortable: "custom"
         },
         {
           title: '性别',
@@ -101,7 +113,7 @@ export default {
               h('Button', {
                 props: {
                   type: 'primary',
-                  icon: "md-add",
+                  icon: "md-create",
                   size: 'small',
                   shape: "circle"
                 },
@@ -131,16 +143,35 @@ export default {
           }
         }
       ],
-      data1: []
+      data: []
     }
   },
   methods: {
-    showAll(status) {
-      this.$http.get('http://localhost:8090/people', {}).then(function(response) {
+    handlePage(value) {
+      this.pageNum = value
+      this.showAll()
+    },
+    handlePageSize(value) {
+      this.pageSize = value
+      this.showAll()
+    },
+    handleSortChange(value) {
+      console.log(value);
+      this.sort = value.key + "," + value.order
+      this.showAll()
+    },
+    showAll() {
+      var params = '?page=' + (this.pageNum - 1).toString() + '&size=' + this.pageSize + '&sort=' + this.sort
+      this.$http.get('http://localhost:8090/people' + params, {}).then(function(response) {
         // response.data中获取ResponseData实体
         console.log(response.data)
         console.log(response.data._embedded.people)
-        this.data1 = response.data._embedded.people
+        console.log(response.data.page)
+        this.data = response.data._embedded.people
+        this.page = response.data.page
+        this.pageSize = this.page.size
+        this.pageNum = this.page.number + 1
+        this.pageTotal = this.page.totalElements
       }, function(response) {
         // 发生错误
       })
@@ -149,20 +180,26 @@ export default {
       console.log(index);
       this.showCreate = true
     },
+    show(index) {
+      console.log(index);
+      this.people = this.data[parseInt(index)]
+      console.log(this.people);
+      this.showDetail = true
+    },
     edit(index) {
       console.log(index);
-      this.people = this.data1[parseInt(index)]
+      this.people = this.data[parseInt(index)]
       console.log(this.people);
       this.showEdit = true
     },
     remove(index) {
       console.log(index);
-      var item = this.data1[parseInt(index)]
+      var item = this.data[parseInt(index)]
       console.log(item);
       this.$http.delete(item._links.self.href, {}).then(function(response) {
         // response.data中获取ResponseData实体
         console.log(response.data)
-        this.data1.splice(index, 1)
+        this.data.splice(index, 1)
       }, function(response) {
         // 发生错误
       })
