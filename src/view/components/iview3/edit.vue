@@ -54,7 +54,7 @@ export default {
   methods: {
     edit() {
       console.log(this.people);
-      this.$http.put(this.people._links.self.href, this.people).then(function(response) {
+      this.$http.put(this.people.links[0].href, this.people).then(function(response) {
         // response.data中获取ResponseData实体
         console.log(response.data)
         this.$emit('ok-edit', true)
@@ -64,7 +64,7 @@ export default {
       })
     },
     reset() {
-      this.people = {_links:this.people._links}
+      this.people = {links:this.people.links}
     },
     cancel() {
       this.$emit('show-edit', false)

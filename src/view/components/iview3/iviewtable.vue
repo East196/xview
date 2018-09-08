@@ -1,19 +1,19 @@
 <template>
-<div>
+<div style="margin-right:20px;">
   <Row :gutter="14">
     <i-col span="24">
       <Card>
         <Row>
           <ButtonGroup>
-            <Button :size="buttonSize" icon="md-search" type="info">查询</Button>
-            <Button :size="buttonSize" @click="create()" icon="md-add" type="primary">新增</Button>
-            <Button :size="buttonSize" @click="edit()" icon="md-create" type="success">修改</Button>
-            <Button :size="buttonSize" @click="deleteAll()" icon="md-remove" type="error">删除</Button>
+            <Button icon="md-search" type="info">查询</Button>
+            <Button @click="create()" icon="md-add" type="primary">新增</Button>
+            <Button @click="editSelected()" icon="md-create" type="success">修改</Button>
+            <Button @click="removeSelected()" icon="md-remove" type="error">删除</Button>
           </ButtonGroup>
         </Row>
         <br>
         <Row>
-          <Table border ref="selection" :size="small" :columns="columns" :data="data" @on-sort-change="handleSortChange"></Table>
+          <Table border ref="selection" :columns="columns" :data="data" @on-selection-change="handleSelectionChange" @on-sort-change="handleSortChange"></Table>
         </Row>
         <br>
         <Row>
@@ -29,10 +29,8 @@
     <i-col span="24">
       <Card>
         {{showCreate}} {{showEdit}} {{showDetail}}
-        <br>
-        {{people}}
-        <br>
-        {{page}} {{pageSize}} {{pageNum}} {{pageTotal}} {{sort}}
+        <br> {{people}} {{selection}}
+        <br> {{page}} {{pageSize}} {{pageNum}} {{pageTotal}} {{sort}}
       </Card>
     </i-col>
   </Row>
@@ -40,10 +38,12 @@
 </template>
 
 <script>
-import axios from '@/libs/api.request'
+import reject from 'lodash/reject'
 import Create from './create.vue'
 import Edit from './edit.vue'
 import Detail from './detail.vue'
+
+
 export default {
   name: 'iviewtable',
   components: {
@@ -53,7 +53,9 @@ export default {
   },
   data() {
     return {
-      pageSize: 20,
+      selection: [],
+
+      pageSize: 10,
       pageNum: 1,
       pageTotal: 0,
 
@@ -73,12 +75,17 @@ export default {
           align: 'center'
         },
         {
-          title: 'Name',
-          key: 'name',
+          title: '姓',
+          key: 'lastName',
           width: 200
         },
         {
-          title: 'Age',
+          title: '名',
+          key: 'firstName',
+          width: 200
+        },
+        {
+          title: '年龄',
           key: 'age',
           sortable: "custom"
         },
@@ -87,7 +94,7 @@ export default {
           key: 'sex'
         },
         {
-          title: 'Action',
+          title: '操作',
           key: 'action',
           width: 120,
           fixed: 'right',
@@ -160,18 +167,24 @@ export default {
       this.sort = value.key + "," + value.order
       this.showAll()
     },
+    handleSelectionChange(value) {
+      console.log(value);
+      this.selection = value
+    },
     showAll() {
       var params = '?page=' + (this.pageNum - 1).toString() + '&size=' + this.pageSize + '&sort=' + this.sort
       this.$http.get('http://localhost:8090/people' + params, {}).then(function(response) {
         // response.data中获取ResponseData实体
         console.log(response.data)
-        console.log(response.data._embedded.people)
+        console.log(response.data.content)
         console.log(response.data.page)
-        this.data = response.data._embedded.people
         this.page = response.data.page
         this.pageSize = this.page.size
         this.pageNum = this.page.number + 1
         this.pageTotal = this.page.totalElements
+        if (this.pageTotal > 0) {
+          this.data = response.data.content
+        }
       }, function(response) {
         // 发生错误
       })
@@ -196,7 +209,7 @@ export default {
       console.log(index);
       var item = this.data[parseInt(index)]
       console.log(item);
-      this.$http.delete(item._links.self.href, {}).then(function(response) {
+      this.$http.delete(item.links[0].href, {}).then(function(response) {
         // response.data中获取ResponseData实体
         console.log(response.data)
         this.data.splice(index, 1)
@@ -204,8 +217,27 @@ export default {
         // 发生错误
       })
     },
-    deleteAll() {
-      console.log("deleteAll");
+    editSelected() {
+      console.log("editSelected", this.selection.length);
+      if (this.selection.length == 1) {
+        this.people = this.selection[0]
+        console.log(this.people);
+        this.showEdit = true
+      }
+    },
+    removeSelected() {
+      console.log("removeSelected", this.selection.length);
+      this.selection.forEach((item) => {
+        console.log(item);
+        this.data = reject(this.data, { 'id': item["id"] });
+        this.$http.delete(item.links[0].href, {}).then(function(response) {
+          // response.data中获取ResponseData实体
+          console.log("deleted!", response.data)
+
+        }, function(response) {
+          // 发生错误
+        })
+      })
     }
   },
   mounted() {
