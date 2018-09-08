@@ -54,7 +54,7 @@ export default [
   },
   {
     path: '/iview3',
-    name: 'iview3',
+    name: 'iview',
     component: Main,
     children: [
       {
@@ -65,6 +65,15 @@ export default [
           title: 'iview3组件'
         },
         component: () => import('@/view/components/iview3/iview3.vue')
+      },
+      {
+        path: 'iviewtable',
+        name: 'iviewtable',
+        meta: {
+          icon: '_qq',
+          title: 'iviewtable组件'
+        },
+        component: () => import('@/view/components/iview3/iviewtable.vue')
       }
     ]
   },
