@@ -4,36 +4,27 @@
     <i-col span="24">
       <Card>
         <Row :gutter="14">
-              <Search @ok-search="handleSearch"></Search>
+              <Search @ok-search="handleSearch" @on-reset="handleReset" :search="search"></Search>
         </Row>
-        <Row>
-          <ButtonGroup>
-            <Button icon="md-search" type="info">查询</Button>
-            <Button @click="create()" icon="md-add" type="primary">新增</Button>
-            <Button @click="editSelected()" icon="md-create" type="success">修改</Button>
-            <Button @click="removeSelected()" icon="md-remove" type="error">删除</Button>
-          </ButtonGroup>
-        </Row>
-        <br>
         <Row>
           <Table border ref="selection" :columns="columns" :data="data" @on-selection-change="handleSelectionChange" @on-sort-change="handleSortChange"></Table>
         </Row>
         <br>
         <Row>
-          <Page :total="pageTotal" :current="pageNum" :page-size="pageSize" show-elevator show-sizer show-total placement="top" @on-change="handlePage" @on-page-size-change='handlePageSize'></Page>
+          <i-col span="16">
+            <ButtonGroup>
+              <Button @click="create()" icon="md-add" type="primary">新增</Button>
+              <Button @click="editSelected()" icon="md-create" type="warning">修改</Button>
+              <Button @click="removeSelected()" icon="md-remove" type="error">删除</Button>
+            </ButtonGroup>
+          </i-col>
+          <i-col span="8" >
+            <Page :total="pageTotal" :current="pageNum" :page-size="pageSize" show-elevator show-sizer show-total placement="top" @on-change="handlePage" @on-page-size-change='handlePageSize'></Page>
+          </i-col>
         </Row>
-        <Create :show-create="showCreate" v-on:ok-create="showAll()" v-on:show-create="showCreate=$event"></Create>
-        <Edit :people="people" :show-edit="showEdit" v-on:ok-edit="showAll()" v-on:show-edit="showEdit=$event"></Edit>
-        <Detail :people="people" :show-detail="showDetail" v-on:show-detail="showDetail=$event"></Detail>
-      </Card>
-    </i-col>
-  </Row>
-  <Row :gutter="14">
-    <i-col span="24">
-      <Card>
-        {{showCreate}} {{showEdit}} {{showDetail}}
-        <br> {{people}} {{selection}}
-        <br> {{page}} {{pageSize}} {{pageNum}} {{pageTotal}} {{sort}}
+        <Create :show-create="showCreate" v-on:ok-create="handleSearch()" v-on:show-create="showCreate=$event"></Create>
+        <Edit :person="person" :show-edit="showEdit" v-on:ok-edit="handleSearch()" v-on:show-edit="showEdit=$event"></Edit>
+        <Detail :person="person" :show-detail="showDetail" v-on:show-detail="showDetail=$event"></Detail>
       </Card>
     </i-col>
   </Row>
@@ -47,7 +38,6 @@ import Edit from './edit.vue'
 import Detail from './detail.vue'
 import Search from './search.vue'
 
-
 export default {
   name: 'iviewtable',
   components: {
@@ -58,6 +48,20 @@ export default {
   },
   data() {
     return {
+      search: {
+        lastName: {
+          like: ""
+        },
+        firstName: {
+          like: ""
+        },
+        age: {
+          eq: ""
+        },
+        sex: {
+          eq: ""
+        },
+      },
       selection: [],
 
       pageSize: 10,
@@ -70,7 +74,7 @@ export default {
 
       showDetail: false,
       showEdit: false,
-      people: {},
+      person: {},
 
       showCreate: false,
       columns: [{
@@ -124,7 +128,7 @@ export default {
               }),
               h('Button', {
                 props: {
-                  type: 'primary',
+                  type: 'warning',
                   icon: "md-create",
                   size: 'small',
                   shape: "circle"
@@ -162,7 +166,7 @@ export default {
     handleSearch(value) {
       console.log(value);
       var params = '?page=' + (this.pageNum - 1).toString() + '&size=' + this.pageSize + '&sort=' + this.sort
-      this.$http.post('http://localhost:8090/people/show' + params, value).then(function(response) {
+      this.$http.post('http://localhost:8090/persons/show' + params, this.search).then(function(response) {
         // response.data中获取ResponseData实体
         console.log(response.data)
         console.log(response.data.data)
@@ -178,40 +182,38 @@ export default {
         // 发生错误
       })
     },
+    handleReset(name) {
+      this.search = {
+        lastName: {
+          like: ""
+        },
+        firstName: {
+          like: ""
+        },
+        age: {
+          eq: ""
+        },
+        sex: {
+          eq: ""
+        },
+      }
+    },
     handlePage(value) {
       this.pageNum = value
-      this.showAll()
+      this.handleSearch()
     },
     handlePageSize(value) {
       this.pageSize = value
-      this.showAll()
+      this.handleSearch()
     },
     handleSortChange(value) {
       console.log(value);
       this.sort = value.key + "," + value.order
-      this.showAll()
+      this.handleSearch()
     },
     handleSelectionChange(value) {
       console.log(value);
       this.selection = value
-    },
-    showAll() {
-      var params = '?page=' + (this.pageNum - 1).toString() + '&size=' + this.pageSize + '&sort=' + this.sort
-      this.$http.get('http://localhost:8090/people' + params, {}).then(function(response) {
-        // response.data中获取ResponseData实体
-        console.log(response.data)
-        console.log(response.data.content)
-        console.log(response.data.page)
-        this.page = response.data.page
-        this.pageSize = this.page.size
-        this.pageNum = this.page.number + 1
-        this.pageTotal = this.page.totalElements
-
-        this.data = response.data.content
-
-      }, function(response) {
-        // 发生错误
-      })
     },
     create(index) {
       console.log(index);
@@ -219,21 +221,21 @@ export default {
     },
     show(index) {
       console.log(index);
-      this.people = this.data[parseInt(index)]
-      console.log(this.people);
+      this.person = this.data[parseInt(index)]
+      console.log(this.person);
       this.showDetail = true
     },
     edit(index) {
       console.log(index);
-      this.people = this.data[parseInt(index)]
-      console.log(this.people);
+      this.person = this.data[parseInt(index)]
+      console.log(this.person);
       this.showEdit = true
     },
     remove(index) {
       console.log(index);
       var item = this.data[parseInt(index)]
       console.log(item);
-      this.$http.delete(item.links[0].href, {}).then(function(response) {
+      this.$http.delete("http://localhost:8090/persons/"+item.id, {}).then(function(response) {
         // response.data中获取ResponseData实体
         console.log(response.data)
         this.data.splice(index, 1)
@@ -244,8 +246,8 @@ export default {
     editSelected() {
       console.log("editSelected", this.selection.length);
       if (this.selection.length == 1) {
-        this.people = this.selection[0]
-        console.log(this.people);
+        this.person = this.selection[0]
+        console.log(this.person);
         this.showEdit = true
       }else{
         this.$Message.error('只有选中一条记录的时候才能修改!');
@@ -255,8 +257,8 @@ export default {
       console.log("removeSelected", this.selection.length);
       this.selection.forEach((item) => {
         console.log(item);
-        this.data = reject(this.data, { 'id': item["id"] });
-        this.$http.delete(item.links[0].href, {}).then(function(response) {
+        // this.data = reject(this.data, { 'id': item["id"] });
+        this.$http.delete("http://localhost:8090/persons/"+item.id, {}).then(function(response) {
           // response.data中获取ResponseData实体
           console.log("deleted!", response.data)
 
@@ -267,7 +269,7 @@ export default {
     }
   },
   mounted() {
-    this.showAll(true)
+    this.handleSearch(true)
   }
 }
 </script>

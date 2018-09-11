@@ -2,18 +2,18 @@
 
   <Drawer title="查看用户详情" :closable="false" v-model="showDetail">
     <Row type="flex" justify="center" align="middle">
-      <Form ref="people" :model="people" inline>
-        <FormItem label="名">
-          <Input v-model="people.firstName" disabled placeholder="请输入 名" clearable style="width: 200px"></Input>
+      <Form ref="person" :model="person" inline>
+        <FormItem label="名" prop="firstName">
+          <Input v-model="person.firstName" placeholder="请输入 名" clearable style="width: 200px"></Input>
         </FormItem>
-        <FormItem label="姓">
-          <Input v-model="people.lastName" disabled placeholder="请输入 姓" style="width: 200px"></Input>
+        <FormItem label="姓" prop="lastName">
+          <Input v-model="person.lastName" placeholder="请输入 姓" style="width: 200px"></Input>
         </FormItem>
-        <FormItem label="年龄">
-          <Input v-model="people.age" disabled placeholder="请输入 年龄" style="width: 200px"></Input>
+        <FormItem label="年龄" prop="age">
+          <Input v-model="person.age" placeholder="请输入 年龄" style="width: 200px"></Input>
         </FormItem>
-        <FormItem label="性别">
-          <Select v-model="people.sex" disabled style="width:200px">
+        <FormItem label="性别" prop="sex">
+          <Select v-model="person.sex" style="width:200px">
             <Option v-for="item in sexs" :value="item.value" :key="item.value">{{ item.label }}</Option>
         </Select>
         </FormItem>
@@ -22,7 +22,6 @@
           <ButtonGroup>
             <Button @click="cancel()">取消</Button>
           </ButtonGroup>
-          {{showDetail}}
         </FormItem>
       </Form>
     </Row>
@@ -35,7 +34,7 @@ export default {
   name: 'Detail',
   props: {
     'showDetail': Boolean,
-    'people': Object
+    'person': Object
   },
   data() {
     return {

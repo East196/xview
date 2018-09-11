@@ -148,11 +148,6 @@ export default {
       color3: '#19be6b',
       daterange: ['2018-01-01', '2018-02-15'],
       switch1: true,
-
-
-
-
-
     }
   },
   methods: {
