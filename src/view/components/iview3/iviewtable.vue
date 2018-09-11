@@ -3,6 +3,9 @@
   <Row :gutter="14">
     <i-col span="24">
       <Card>
+        <Row :gutter="14">
+              <Search @ok-search="handleSearch"></Search>
+        </Row>
         <Row>
           <ButtonGroup>
             <Button icon="md-search" type="info">查询</Button>
@@ -42,6 +45,7 @@ import reject from 'lodash/reject'
 import Create from './create.vue'
 import Edit from './edit.vue'
 import Detail from './detail.vue'
+import Search from './search.vue'
 
 
 export default {
@@ -49,7 +53,8 @@ export default {
   components: {
     Create,
     Edit,
-    Detail
+    Detail,
+    Search
   },
   data() {
     return {
@@ -154,6 +159,25 @@ export default {
     }
   },
   methods: {
+    handleSearch(value) {
+      console.log(value);
+      var params = '?page=' + (this.pageNum - 1).toString() + '&size=' + this.pageSize + '&sort=' + this.sort
+      this.$http.post('http://localhost:8090/people/show' + params, value).then(function(response) {
+        // response.data中获取ResponseData实体
+        console.log(response.data)
+        console.log(response.data.data)
+        console.log(response.data.page)
+        this.page = response.data.page
+        this.pageSize = this.page.size
+        this.pageNum = this.page.number + 1
+        this.pageTotal = this.page.totalElements
+
+        this.data = response.data.data
+
+      }, function(response) {
+        // 发生错误
+      })
+    },
     handlePage(value) {
       this.pageNum = value
       this.showAll()
@@ -182,9 +206,9 @@ export default {
         this.pageSize = this.page.size
         this.pageNum = this.page.number + 1
         this.pageTotal = this.page.totalElements
-        if (this.pageTotal > 0) {
-          this.data = response.data.content
-        }
+
+        this.data = response.data.content
+
       }, function(response) {
         // 发生错误
       })
@@ -223,6 +247,8 @@ export default {
         this.people = this.selection[0]
         console.log(this.people);
         this.showEdit = true
+      }else{
+        this.$Message.error('只有选中一条记录的时候才能修改!');
       }
     },
     removeSelected() {

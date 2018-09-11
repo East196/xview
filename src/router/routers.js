@@ -62,9 +62,18 @@ export default [
         name: 'iview3',
         meta: {
           icon: '_qq',
-          title: 'iview3组件'
+          title: 'iview组件'
         },
         component: () => import('@/view/components/iview3/iview3.vue')
+      },
+      {
+        path: 'search',
+        name: 'search',
+        meta: {
+          icon: '_qq',
+          title: 'iview表单'
+        },
+        component: () => import('@/view/components/iview3/search.vue')
       },
       {
         path: 'iviewtable',
